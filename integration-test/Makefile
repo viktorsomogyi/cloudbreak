@@ -97,3 +97,35 @@ upload-s3:
 	aws s3 cp ./apidefinitions/redbeams.json s3://redbeams-swagger/swagger-$(VERSION).json --acl public-read
 	aws s3 cp ./apidefinitions/datalake.json s3://datalake-swagger/swagger-$(VERSION).json --acl public-read
 	aws s3 cp ./apidefinitions/autoscale.json s3://autoscale-swagger/swagger-$(VERSION).json --acl public-read
+
+fetch-qaas-credential:
+	./scripts/fetch_qaas_credential.sh
+
+fetch-qaas-credential-docker:
+	docker run --rm -v "${PWD}/:/tmp/" \
+	-e AZURE_CLIENT_ID=${AZURE_CLIENT_ID} \
+	-e AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET} \
+	-e AZURE_TENANT_ID=${AZURE_TENANT_ID} \
+	-e AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID} \
+	docker-private.infra.cloudera.com/cloudera_thirdparty/mcr.microsoft.com/azure-cli:1.0 /bin/bash -c 'cd /tmp/ && ./scripts/fetch_qaas_credential.sh'
+
+create-private-stack:
+	docker run -i \
+	--rm \
+	--name qaas-create-private-stack \
+	--volume $(PWD)/credential:/tmp/credential \
+	hortonworks/qaas-cloudbreak-client python /tmp/create_private_stack.py | tee qaas.log
+
+delete-private-stack:
+	docker run -i \
+	--rm \
+	--name qaas-delete-private-stack \
+	--volume $(PWD)/credential:/tmp/credential \
+	hortonworks/qaas-cloudbreak-client python /tmp/delete_private_stack.py $(WORKSPACE_NAME) | tee qaas.log
+
+get-job-status:
+	docker run -i \
+	--rm \
+	--name qaas-get-job-status \
+	--volume $(PWD)/credential:/tmp/credential \
+	hortonworks/qaas-cloudbreak-client python /tmp/get_job_status.py $(JOB_NAME) | tee qaas.log
