@@ -55,6 +55,8 @@ public class DiagnosticsFlowService {
 
     private static final String AWS_METADATA_SERVER_V2_SUPPORT_VERSION = "0.4.9";
 
+    private static final String MULTI_AZ_SUPPORT_VERSION = "0.4.12";
+
     private static final String AWS_EC2_METADATA_SERVICE_WARNING = "Could be related with unavailable instance metadata service response " +
             "from ec2 node. (region, domain)";
 
@@ -95,6 +97,7 @@ public class DiagnosticsFlowService {
                     String cdpTelemetryVersion = nodeStatusReport.getCdpTelemetryVersion();
                     boolean stableNetworkCheckSupported = isVersionGreaterOrEqual(cdpTelemetryVersion, STABLE_NETWORK_CHECK_VERSION);
                     boolean awsMetadataServerV2Supported = isVersionGreaterOrEqual(cdpTelemetryVersion, AWS_METADATA_SERVER_V2_SUPPORT_VERSION);
+                    boolean multiAzSupported = isVersionGreaterOrEqual(cdpTelemetryVersion, MULTI_AZ_SUPPORT_VERSION);
                     List<NodeStatusProto.NetworkDetails> networkNodes = nodeStatusReport.getNodesList().stream()
                             .map(NodeStatusProto.NodeStatus::getNetworkDetails)
                             .collect(Collectors.toList());
@@ -105,7 +108,7 @@ public class DiagnosticsFlowService {
                         firePreFlightCheckEvents(stackId, String.format("DataBus API ('%s') accessibility", databusEndpoint),
                                 networkNodes, NodeStatusProto.NetworkDetails::getDatabusAccessible);
                     }
-                    String databusS3Endpoint = dataBusEndpointProvider.getDatabusS3Endpoint(databusEndpoint);
+                    String databusS3Endpoint = dataBusEndpointProvider.getDatabusS3Endpoint(databusEndpoint, !multiAzSupported);
                     if (StringUtils.isNotBlank(databusS3Endpoint)) {
                         firePreFlightCheckEvents(stackId, String.format("DataBus S3 API ('%s') accessibility", databusS3Endpoint),
                                 networkNodes, NodeStatusProto.NetworkDetails::getDatabusS3Accessible, stableNetworkCheckSupported);
