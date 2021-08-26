@@ -34,6 +34,7 @@ import com.sequenceiq.environment.api.v1.environment.model.request.LocationReque
 import com.sequenceiq.environment.api.v1.environment.model.request.SecurityAccessRequest;
 import com.sequenceiq.environment.api.v1.environment.model.request.aws.AwsEnvironmentParameters;
 import com.sequenceiq.environment.api.v1.environment.model.request.azure.AzureEnvironmentParameters;
+import com.sequenceiq.environment.api.v1.environment.model.request.azure.AzureResourceEncryptionParameters;
 import com.sequenceiq.environment.api.v1.environment.model.response.DetailedEnvironmentResponse;
 import com.sequenceiq.environment.api.v1.environment.model.response.EnvironmentStatus;
 import com.sequenceiq.environment.api.v1.environment.model.response.SimpleEnvironmentResponse;
@@ -246,6 +247,23 @@ public class EnvironmentTestDto
 
     public EnvironmentTestDto withResourceGroup(String resourceGroupUsage, String resourceGroupName) {
         return getCloudProvider().withResourceGroup(this, resourceGroupUsage, resourceGroupName);
+    }
+
+    public EnvironmentTestDto withAzureResourceEncryptionParameters(String encryptionKeyUrl, String resourceGroup) {
+        if (CloudPlatform.AZURE.equals(getTestContext().getCloudProvider().getCloudPlatform())) {
+            AzureResourceEncryptionParameters azureResourceEncryptionParameters = AzureResourceEncryptionParameters.builder()
+                    .withEncryptionKeyUrl(encryptionKeyUrl)
+                    .withEncryptionKeyResourceGroupName(resourceGroup)
+                    .build();
+            if (getRequest().getAzure() == null) {
+                getRequest().setAzure(AzureEnvironmentParameters.builder()
+                        .withResourceEncryptionParameters(azureResourceEncryptionParameters)
+                        .build());
+            } else {
+                getRequest().getAzure().setResourceEncryptionParameters(azureResourceEncryptionParameters);
+            }
+        }
+        return this;
     }
 
     public EnvironmentTestDto withAws(AwsEnvironmentParameters awsEnvironmentParameters) {
