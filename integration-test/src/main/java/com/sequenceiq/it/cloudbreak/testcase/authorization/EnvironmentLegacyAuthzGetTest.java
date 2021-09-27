@@ -36,7 +36,7 @@ public class EnvironmentLegacyAuthzGetTest extends AbstractMockTest {
         createDefaultImageCatalog(testContext);
     }
 
-    @Test(dataProvider = TEST_CONTEXT_WITH_MOCK)
+    @Test(dataProvider = TEST_CONTEXT_WITH_MOCK, enabled = false)
     @Description(
             given = "there is a running env service",
             when = "valid create environment request is sent",

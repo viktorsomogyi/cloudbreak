@@ -35,9 +35,9 @@ import org.springframework.test.context.ActiveProfiles;
 import com.cloudera.thunderhead.service.authorization.AuthorizationProto;
 import com.google.api.client.util.Lists;
 import com.google.common.collect.Sets;
-import com.sequenceiq.cloudbreak.auth.crn.CrnTestUtil;
 import com.sequenceiq.cloudbreak.auth.altus.EntitlementService;
 import com.sequenceiq.cloudbreak.auth.altus.GrpcUmsClient;
+import com.sequenceiq.cloudbreak.auth.crn.CrnTestUtil;
 import com.sequenceiq.cloudbreak.cloud.event.platform.ResourceDefinitionRequest;
 import com.sequenceiq.cloudbreak.cloud.event.platform.ResourceDefinitionResult;
 import com.sequenceiq.cloudbreak.util.FileReaderUtils;
@@ -83,11 +83,11 @@ public class CredentialAuthorizationIntegrationTest {
     @MockBean
     private RequestProvider requestProvider;
 
-    @Mock
-    private ResourceDefinitionRequest resourceDefinitionRequest;
-
     @MockBean
     private EntitlementService entitlementService;
+
+    @Mock
+    private ResourceDefinitionRequest resourceDefinitionRequest;
 
     @Inject
     private CredentialRepository credentialRepository;
@@ -106,7 +106,6 @@ public class CredentialAuthorizationIntegrationTest {
             return rightChecks.stream().map(r -> Boolean.TRUE).collect(toList());
         });
         lenient().when(grpcUmsClient.checkAccountRight(anyString(), anyString(), any())).thenReturn(true);
-        when(entitlementService.isAuthorizationEntitlementRegistered(anyString())).thenReturn(Boolean.TRUE);
         mockPermissions();
     }
 
