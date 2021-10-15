@@ -91,6 +91,7 @@ public class OperationDescriptions {
         public static final String UPDATE_LOAD_BALANCERS = "Updates an existing cluster with load balancers, including adding the Endpoint Gateway " +
             "if it's enabled.";
         public static final String CHANGE_IMAGE_CATALOG = "Changes image catalog of the cluster";
+        public static final String GENERATE_IMAGE_CATALOG = "Generates an image catalog that only contains the currently used image for creating instances";
     }
 
     public static class ClusterOpDescription {
