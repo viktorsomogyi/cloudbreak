@@ -112,12 +112,14 @@ public class StackUpscaleActions {
                 variables.put(HOSTNAMES, payload.getHostNames());
                 variables.put(REPAIR, payload.isRepair());
                 variables.put(NETWORK_SCALE_DETAILS, payload.getNetworkScaleDetails());
+                variables.put(ADJUSTMENT_WITH_THRESHOLD, payload.getAdjustmentTypeWithThreshold());
             }
 
             @Override
             protected void doExecute(StackScalingFlowContext context, StackScaleTriggerEvent payload, Map<Object, Object> variables) {
                 int instanceCountToCreate = getInstanceCountToCreate(context.getStack(), payload.getInstanceGroup(), payload.getAdjustment());
-                stackUpscaleService.addInstanceFireEventAndLog(context.getStack(), payload.getAdjustment(), payload.getInstanceGroup());
+                stackUpscaleService.addInstanceFireEventAndLog(context.getStack(), payload.getAdjustment(), payload.getInstanceGroup(),
+                        payload.getAdjustmentTypeWithThreshold());
                 if (instanceCountToCreate > 0) {
                     stackUpscaleService.startAddInstances(context.getStack(), payload.getAdjustment(), payload.getInstanceGroup());
                     sendEvent(context);
@@ -158,7 +160,8 @@ public class StackUpscaleActions {
                         .map(r -> cloudResourceConverter.convert(r))
                         .collect(Collectors.toList());
                 CloudStack updatedCloudStack = cloudStackConverter.convert(updatedStack);
-                return new UpscaleStackRequest<UpscaleStackResult>(context.getCloudContext(), context.getCloudCredential(), updatedCloudStack, resources);
+                return new UpscaleStackRequest<UpscaleStackResult>(context.getCloudContext(), context.getCloudCredential(), updatedCloudStack, resources,
+                        context.getAdjustmentWithThreshold());
             }
         };
     }
@@ -209,7 +212,8 @@ public class StackUpscaleActions {
                         .filter(cloudInstance -> InstanceStatus.CREATE_REQUESTED.equals(cloudInstance.getTemplate().getStatus())
                                 || unusedInstancesForGroup.contains(cloudInstance.getInstanceId()))
                         .collect(Collectors.toList());
-                return new CollectMetadataRequest(context.getCloudContext(), context.getCloudCredential(), cloudResources, newCloudInstances, allKnownInstances);
+                return new CollectMetadataRequest(context.getCloudContext(), context.getCloudCredential(), cloudResources, newCloudInstances,
+                        allKnownInstances);
             }
         };
     }
