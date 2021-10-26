@@ -23,6 +23,9 @@ public class UmsClientConfig {
     @Value("${altus.ums.client.list_service_principal_cloud_identities_page_size:100}")
     private int listServicePrincipalCloudIdentitiesPageSize;
 
+    @Value("${altus.ums.calling_service_name:cloudbreak}")
+    private String callingServiceName;
+
     public int getListGroupsPageSize() {
         return listGroupsPageSize;
     }
@@ -45,5 +48,9 @@ public class UmsClientConfig {
 
     public int getListServicePrincipalCloudIdentitiesPageSize() {
         return listServicePrincipalCloudIdentitiesPageSize;
+    }
+
+    public String getCallingServiceName() {
+        return callingServiceName;
     }
 }
